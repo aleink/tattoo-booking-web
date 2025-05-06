@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/tattoo-booking-web/static/css/main.f855e6bc.css",
-    "main.js": "/tattoo-booking-web/static/js/main.7f51dd36.js",
+    "main.css": "/tattoo-booking-web/static/css/main.e6c13ad2.css",
+    "main.js": "/tattoo-booking-web/static/js/main.36dcc552.js",
+    "static/js/952.933c6abe.chunk.js": "/tattoo-booking-web/static/js/952.933c6abe.chunk.js",
     "static/js/453.dfd2ce2a.chunk.js": "/tattoo-booking-web/static/js/453.dfd2ce2a.chunk.js",
-    "static/media/logo.svg": "/tattoo-booking-web/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/tattoo-booking-web/index.html",
-    "main.f855e6bc.css.map": "/tattoo-booking-web/static/css/main.f855e6bc.css.map",
-    "main.7f51dd36.js.map": "/tattoo-booking-web/static/js/main.7f51dd36.js.map",
+    "main.e6c13ad2.css.map": "/tattoo-booking-web/static/css/main.e6c13ad2.css.map",
+    "main.36dcc552.js.map": "/tattoo-booking-web/static/js/main.36dcc552.js.map",
+    "952.933c6abe.chunk.js.map": "/tattoo-booking-web/static/js/952.933c6abe.chunk.js.map",
     "453.dfd2ce2a.chunk.js.map": "/tattoo-booking-web/static/js/453.dfd2ce2a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.7f51dd36.js"
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.36dcc552.js"
   ]
 }
