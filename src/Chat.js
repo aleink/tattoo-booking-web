@@ -1,75 +1,87 @@
+// src/Chat.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [session, setSession] = useState(null);
 
-  // 1) Fetch existing messages from Supabase on component mount
   useEffect(() => {
-  const subscription = supabase
-    .channel('any_unique_channel_name')
-    .on(
-      'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages' },
-      (payload) => {
-        // This runs when a new row is inserted
-        setMessages((current) => [...current, payload.new]);
-      }
-    )
-    .subscribe();
+    // 1) Get current user session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
-  return () => {
-    supabase.removeChannel(subscription);
-  };
-}, []);
+    // 2) Fetch messages from 'messages' table
+    fetchMessages();
 
+    // 3) Subscribe to new messages in real time
+    subscribeToNewMessages();
+  }, []);
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
-      .from('messages')   // or whatever table name you choose
+      .from('messages')
       .select('*')
       .order('created_at', { ascending: true });
-
     if (error) {
-      console.log('Error fetching messages:', error);
+      console.error('Error fetching messages:', error);
     } else {
       setMessages(data);
     }
   };
 
-  // 2) Handle sending a new message
+  // Real-time subscription so new messages appear instantly
+  const subscribeToNewMessages = () => {
+    supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        setMessages((current) => [...current, payload.new]);
+      })
+      .subscribe();
+  };
+
   const handleSend = async () => {
     if (!newMessage.trim()) return;
+
+    // If user is logged in, attach their user_id
+    const userId = session?.user?.id || null;
+
     const { data, error } = await supabase
       .from('messages')
-      .insert([{ text: newMessage }]); // add user_id if needed
-
+      .insert([{ text: newMessage, user_id: userId }]);
     if (error) {
-      console.log('Error sending message:', error);
+      console.error('Error sending message:', error);
     } else {
       setNewMessage('');
-      // fetchMessages(); // or rely on real-time subscription to update
+      // no need to refetch because of real-time subscription
     }
   };
 
   return (
-    <div>
-      <h2>Chat</h2>
-      
-      {/* Message List */}
-      <div style={{ border: '1px solid #ccc', padding: 10, height: 300, overflowY: 'scroll' }}>
+    <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
+      <h2>Chat Screen (Logged In)</h2>
+      <div
+        style={{
+          border: '1px solid #ccc',
+          height: 300,
+          overflowY: 'auto',
+          padding: 10,
+          marginBottom: 10
+        }}
+      >
         {messages.map((msg) => (
-          <div key={msg.id} style={{ margin: '8px 0' }}>
-            <strong>{msg.user_id || 'Anon'}:</strong> {msg.text}
+          <div key={msg.id} style={{ marginBottom: 8 }}>
+            <strong>{msg.user_id || 'Anonymous'}:</strong> {msg.text}
           </div>
         ))}
       </div>
 
-      {/* New Message Input */}
-      <div style={{ marginTop: 10 }}>
+      <div>
         <input
           type="text"
+          placeholder="Type your message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           style={{ width: '80%', marginRight: 8 }}

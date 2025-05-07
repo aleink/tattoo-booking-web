@@ -1,29 +1,20 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import Chat from './Chat';
 
 function App() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [session, setSession] = useState(null);
 
-  // Check auth state on component mount
   useEffect(() => {
-    // 1) Check current session
-    const currentSession = supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
     });
-
-    // 2) Listen for changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-      }
-    );
-
-    // Cleanup
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
   }, []);
 
   const handleLogin = async (e) => {
@@ -45,12 +36,10 @@ function App() {
     }
   };
 
-  // If there's a session, show chat; otherwise show login
   if (session) {
     return <Chat />;
   }
 
-  // Login screen
   return (
     <div style={{ maxWidth: 400, margin: '50px auto', fontFamily: 'sans-serif' }}>
       <h2>Welcome to Tattoo Booking</h2>
@@ -73,17 +62,6 @@ function App() {
         </button>
       </form>
       {message && <p style={{ marginTop: 20 }}>{message}</p>}
-    </div>
-  );
-}
-
-// Placeholder Chat component
-function Chat() {
-  return (
-    <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h2>Chat Screen (Logged In)</h2>
-      <p>This is where we'll build our chat interface.</p>
-      <button onClick={() => supabase.auth.signOut()}>Sign Out</button>
     </div>
   );
 }
