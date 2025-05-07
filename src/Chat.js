@@ -61,7 +61,7 @@ function Chat() {
 
   return (
     <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h2>Chat Screen (Logged In)</h2>
+      <h2>CClub Tattoo Booking System</h2>
       <div
         style={{
           border: '1px solid #ccc',
